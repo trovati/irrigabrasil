@@ -1,8 +1,20 @@
+// src/database/database.module.ts
 import { Module } from '@nestjs/common';
-import { databaseProviders } from './database.providers';
+import { TypeOrmModule } from '@nestjs/typeorm';
 
 @Module({
-  providers: [...databaseProviders],
-  exports: [...databaseProviders],
+  imports: [
+    TypeOrmModule.forRoot({
+      type: 'mysql',
+      host: 'localhost',
+      port: 3306,
+      username: 'root',
+      password: '',
+      database: 'irribrasil',
+      entities: [__dirname + '/../**/*.entity{.ts,.js}'],
+      synchronize: false,
+    }),
+  ],
+  exports: [TypeOrmModule], // Exporta TypeOrmModule para outros módulos
 })
 export class DatabaseModule {}

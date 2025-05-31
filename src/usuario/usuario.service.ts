@@ -1,14 +1,14 @@
-import { Injectable, Inject } from '@nestjs/common';
+import { Injectable, Inject, HttpException, HttpStatus } from '@nestjs/common';
 import { Repository } from 'typeorm';
-import { Usuario } from './usuario.entity';
+import { Usuario } from 'src/entities/usuario.entity';
 import { UsuarioCadastrarDto } from './dto/usuario.create.dto';
-import { ResultDto } from 'src/dto/result.dto';
+import { InjectRepository } from '@nestjs/typeorm';
 
 @Injectable()
 export class UsuarioService {
   constructor(
-    @Inject('USUARIO_REPOSITORY')
-    private usuarioRepository: Repository<Usuario>,
+    @InjectRepository(Usuario)
+    private readonly usuarioRepository: Repository<Usuario>,
   ) {}
 
   async findAll(): Promise<Usuario[]> {
@@ -20,34 +20,35 @@ export class UsuarioService {
     return client;
   }
 
-  async create(data: UsuarioCadastrarDto): Promise<any> {
+  async create(data: UsuarioCadastrarDto): Promise<Usuario> {
     try {
       const clientName = data.name;
-      if (clientName) {
-        return 'Cliente já existe';
+      if (!clientName) {
+        throw new HttpException('Cliente já existe', HttpStatus.CONFLICT);
       }
-      const usuario = new Usuario();
+      const usuario = await this.usuarioRepository.create({
+        name: data.name,
+        email: data.email,
+        endereco: data.endereco,
+        telefone: data.telefone,
+        cep: data.cep,
+        cidade: data.cidade,
+        bairro: data.bairro,
+        ie: data.ie,
+        cnpj: data.cnpj,
+      });
 
-      usuario.name = data.name;
-      usuario.email = data.email;
-      usuario.endereco = data.endereco;
-      usuario.telefone = data.telefone;
-      this.usuarioRepository
-        .save(usuario)
-        .then(() => {
-          return <ResultDto>{
-            status: true,
-            mensagem: 'Salvou',
-          };
-        })
-        .catch(() => {
-          return <ResultDto>{
-            status: false,
-            mensagem: 'Error ao cadastrar usuário',
-          };
-        });
-    } catch (error) {
-      throw error;
+      await this.usuarioRepository.save(usuario);
+      return usuario;
+    } catch (error: any) {
+      console.error(error);
+
+      throw new HttpException(
+        `${error.message}`,
+        (error as HttpException).getStatus
+          ? (error as HttpException).getStatus()
+          : HttpStatus.INTERNAL_SERVER_ERROR,
+      );
     }
   }
 }

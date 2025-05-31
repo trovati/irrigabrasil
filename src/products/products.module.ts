@@ -1,12 +1,15 @@
 import { Module } from '@nestjs/common';
-import { DatabaseModule } from '../database/database.module';
-import { productsProviders } from './products.providers';
+import { TypeOrmModule } from '@nestjs/typeorm';
+import { Products } from '../entities/products.entity';
 import { ProductsService } from './products.service';
 import { ProductsController } from './products.controller';
 
 @Module({
-  imports: [DatabaseModule],
+  imports: [
+    TypeOrmModule.forFeature([Products]), // Registra a entidade Products
+  ],
   controllers: [ProductsController],
-  providers: [...productsProviders, ProductsService],
+  providers: [ProductsService], // Remove os productsProviders
+  exports: [ProductsService], // Exporta o service se for usado por outros módulos
 })
 export class ProductsModule {}

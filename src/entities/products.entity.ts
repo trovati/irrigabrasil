@@ -1,6 +1,6 @@
 import { Entity, Column, PrimaryGeneratedColumn } from 'typeorm';
 
-@Entity()
+@Entity('products')
 export class Products {
   @PrimaryGeneratedColumn()
   id: number;
@@ -8,6 +8,6 @@ export class Products {
   @Column({ name: 'productName' })
   productName: string;
 
-  @Column()
-  price: number;
+  @Column({ name: 'isdeleted' })
+  isDeleted: Boolean;
 }

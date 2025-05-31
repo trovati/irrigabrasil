@@ -1,0 +1,178 @@
+<!doctype html>
+<html>
+  <head>
+    <style>
+      @page {
+        size: A4;
+        margin: 0;
+      }
+      :root {
+        --primary-color: #1976d2;
+        --primary-dark: #1565c0;
+        --primary-light: #e3f2fd;
+      }
+      body {
+        font-family: 'Segoe UI', sans-serif;
+        width: 210mm;
+        min-height: 297mm;
+        margin: 0 auto;
+        padding: 15mm;
+        color: #333;
+        box-sizing: border-box;
+        position: relative;
+      }
+      .header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        border-bottom: 2px solid var(--primary-color);
+        padding-bottom: 10px;
+        margin-bottom: 15px;
+      }
+      .company-name {
+        color: var(--primary-color);
+        font-size: 22px;
+        font-weight: bold;
+      }
+      .order-number {
+        font-size: 16px;
+        color: var(--primary-dark);
+      }
+      .info-grid {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 12px;
+        margin-bottom: 15px;
+      }
+      .info-card {
+        border: 1px solid #ddd;
+        padding: 12px;
+        border-radius: 4px;
+        background-color: var(--primary-light);
+        font-size: 13px;
+      }
+      .info-card h3 {
+        margin-top: 0;
+        margin-bottom: 8px;
+        color: var(--primary-dark);
+        border-bottom: 1px solid var(--primary-color);
+        padding-bottom: 4px;
+        font-size: 14px;
+      }
+      .products {
+        width: 100%;
+        margin: 15px 0;
+        border-collapse: collapse;
+        font-size: 12px;
+      }
+      .products th {
+        text-align: left;
+        padding: 8px 10px;
+        background: var(--primary-color);
+        color: white;
+        font-weight: normal;
+      }
+      .products td {
+        padding: 6px 10px;
+        border-bottom: 1px solid #eee;
+      }
+      .products tr:nth-child(even) {
+        background-color: #f9f9f9;
+      }
+      .totals {
+        text-align: right;
+        font-size: 14px;
+        margin-top: 15px;
+        padding: 12px;
+        background-color: var(--primary-light);
+        border-radius: 4px;
+        margin-bottom: 15px; /* Espaço para a assinatura */
+      }
+      .signature {
+        text-align: center;
+        margin-top: 50px; /* Exatamente 15px do bloco de totais */
+      }
+      .signature-line {
+        width: 200px;
+        margin: 0 auto;
+        border-top: 1px solid var(--primary-color);
+        padding-top: 4px;
+        margin-bottom: 5px;
+      }
+      .signature-text {
+        font-size: 13px;
+      }
+      @media print {
+        body {
+          padding: 15mm;
+          width: 210mm;
+          height: auto;
+          min-height: 297mm;
+        }
+        .info-card,
+        .totals {
+          background-color: white !important;
+          border: 1px solid #ccc;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <div class="header">
+      <div class="company-name">IRRIGA BRASIL REPRESENTAÇÕES</div>
+      <div class="order-number">PEDIDO #{{requestProtocol}}</div>
+    </div>
+
+    <div class="info-grid">
+      <div class="info-card">
+        <h3>DADOS DO CLIENTE</h3>
+        <p><strong>Nome:</strong> {{ClientName}}</p>
+        <p><strong>Endereço:</strong> {{Address}}</p>
+        <p><strong>Cidade:</strong> {{City}} / {{Bairro}}- CEP: {{CEP}}</p>
+        <p><strong>CNPJ:</strong> {{CNPJ}}</p>
+        <p><strong>IE:</strong> {{IE}}</p>
+      </div>
+
+      <div class="info-card">
+        <h3>INFORMAÇÕES DO PEDIDO</h3>
+        <p><strong>Data:</strong> {{dateRequest}}</p>
+        <p><strong>Pagamento:</strong> {{payment}}</p>
+        <p><strong>Frete:</strong> CIF</p>
+        <p><strong>Transportadora:</strong> ___________</p>
+        <p><strong>Previsão Entrega:</strong> ___________</p>
+      </div>
+    </div>
+
+    <table class="products">
+      <thead>
+        <tr>
+          <th>CÓDIGO</th>
+          <th>DESCRIÇÃO</th>
+          <th>QTD.</th>
+          <th>UNITÁRIO</th>
+          <th>TOTAL</th>
+        </tr>
+      </thead>
+      <tbody>
+        {{#each Products}}
+        <tr>
+          <td>{{id}}</td>
+          <td>{{description}}</td>
+          <td>{{quantity}}</td>
+          <td>R$ {{valuePerProduct}}</td>
+          <td>R$ {{totalPerProduct}}</td>
+        </tr>
+        {{/each}}
+      </tbody>
+    </table>
+
+    <div class="totals">
+      <p><strong>TOTAL DO PEDIDO: R$ {{Total}}</strong></p>
+    </div>
+
+    <div class="signature">
+      <div class="signature-line"></div>
+      <div class="signature-text">Matson Matos</div>
+    </div>
+  </body>
+</html>

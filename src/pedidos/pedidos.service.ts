@@ -31,6 +31,21 @@ export class PedidosService {
     return this.pedidosRepository.find();
   }
 
+  async payments() {
+    try {
+      const payments = await this.paymentRepository.find();
+
+      return payments;
+    } catch (error) {
+      throw new HttpException(
+        `${error.message}`,
+        (error as HttpException).getStatus
+          ? (error as HttpException).getStatus()
+          : HttpStatus.INTERNAL_SERVER_ERROR,
+      );
+    }
+  }
+
   async findOne(idPedido: number) {
     const pedido = await this.pedidosRepository.findOne({
       where: { id: idPedido },
@@ -61,6 +76,7 @@ export class PedidosService {
 
       let totalRequest = 0;
       const produtos = [];
+      const productsPdf = [];
       for (let p of payload.products) {
         const findProduct = await this.productsRepository.findOne({
           where: { id: p.idProduct, isDeleted: false },
@@ -75,14 +91,14 @@ export class PedidosService {
 
         const totalPerProduct = p.quantity * p.valuePerProduct;
 
-        totalRequest = totalRequest + totalPerProduct;
+        totalRequest = totalRequest + +totalPerProduct.toFixed(2);
         const createProductGroupMembers =
           await this.productGroupMembersRepository.create({
             idProduct: p.idProduct,
             idProductGroup: productGroup.id,
             quantity: p.quantity,
             valuePerProduct: p.valuePerProduct,
-            totalPerProduct,
+            totalPerProduct: +totalPerProduct.toFixed(2),
           });
 
         await this.productGroupMembersRepository.save(
@@ -93,11 +109,26 @@ export class PedidosService {
           description: findProduct.productName,
           quantity: p.quantity,
           valuePerProduct: p.valuePerProduct,
-          totalPerProduct,
+          totalPerProduct: +totalPerProduct.toFixed(2),
         };
         produtos.push(products);
+        const productsFormattedPdf = {
+          id: findProduct.id,
+          description: findProduct.productName,
+          quantity: p.quantity,
+          valuePerProduct: p.valuePerProduct.toLocaleString('pt-BR', {
+            // Opcional: versão formatada
+            minimumFractionDigits: 4,
+            maximumFractionDigits: 4,
+          }),
+          totalPerProduct: totalPerProduct.toLocaleString('pt-BR', {
+            // Opcional: versão formatada
+            minimumFractionDigits: 2,
+            maximumFractionDigits: 2,
+          }),
+        };
+        productsPdf.push(productsFormattedPdf);
       }
-
       const today = new Date().toLocaleString('pt-BR');
       const match = today.match(/^(\d{2})\/(\d{2})\/(\d{4})/);
 
@@ -115,7 +146,7 @@ export class PedidosService {
         idProductGroup: productGroup.id,
         idClient: cliente.id,
         idpayment: payload.payment,
-        total: totalRequest,
+        total: +totalRequest.toFixed(2),
         requestprotocol: requestProtocol + `${countId}`,
       });
 
@@ -125,9 +156,13 @@ export class PedidosService {
       });
       const requestPdf: TemplateData = {
         client: cliente,
-        produtos,
+        produtos: productsPdf,
         requestProtocol,
-        totalRequest,
+        totalRequest: totalRequest.toLocaleString('pt-BR', {
+          // Opcional: versão formatada
+          minimumFractionDigits: 2,
+          maximumFractionDigits: 2,
+        }),
         dateRequest: today,
         payment: findPayment.method,
       };

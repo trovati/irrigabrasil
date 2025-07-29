@@ -4,7 +4,7 @@ export interface TemplateData {
   client: Usuario;
   produtos: Produto[];
   requestProtocol: string;
-  totalRequest: number;
+  totalRequest: string;
   dateRequest: string;
   payment: string;
 }

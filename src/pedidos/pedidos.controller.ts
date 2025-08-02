@@ -10,6 +10,11 @@ export class PedidosController {
     return this.requestService.findAll();
   }
 
+  @Get('payments')
+  async payments(): Promise<any> {
+    return this.requestService.payments();
+  }
+
   @Post('createOrder')
   async create(@Body() payload: any): Promise<any> {
     return this.requestService.create(payload);

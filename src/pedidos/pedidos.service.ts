@@ -165,6 +165,7 @@ export class PedidosService {
         }),
         dateRequest: today,
         payment: findPayment.method,
+        obs: payload.obs
       };
       await generatePDF(requestPdf);
       return requestPdf;

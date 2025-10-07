@@ -7,6 +7,7 @@ export interface TemplateData {
   totalRequest: string;
   dateRequest: string;
   payment: string;
+  obs?: string;
 }
 
 export interface Produto {

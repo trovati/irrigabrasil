@@ -27,6 +27,7 @@ export async function generatePDF(data: TemplateData) {
     Bairro: data.client.bairro,
     Total: data.totalRequest,
     payment: data.payment,
+    obs: data.obs
   });
 
   const browser = await puppeteer.launch();
